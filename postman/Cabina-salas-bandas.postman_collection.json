@@ -1,0 +1,2758 @@
+{
+  "info": {
+    "name": "Cabina - Persona 1 (Salas y Bandas)",
+    "description": "Requests de la persona 1 de la API Cabina: salas y bandas. Orden de las carpetas: Salas, Bandas, Consultas, Errores. Las carpetas Consultas y Errores que dependen de reservas o músicos se corren después de que existan esos datos. Después se unifica con las colecciones de las otras personas en la colección Cabina.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Salas",
+      "item": [
+        {
+          "name": "Crear sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.environment.set('roomId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": []
+            },
+            "description": "Crea una sala. Guarda el id en la variable roomId.\n\nStatus esperado: 201",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 8,\n  \"floor\": 1,\n  \"hasDrumKit\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Crear sala (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": []
+                },
+                "description": "Crea una sala. Guarda el id en la variable roomId.\n\nStatus esperado: 201",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 8,\n  \"floor\": 1,\n  \"hasDrumKit\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 8,\n  \"floor\": 1,\n  \"hasDrumKit\": true,\n  \"status\": \"disponible\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar salas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": []
+            },
+            "description": "Lista las salas con paginación (page 1, limit 10 por defecto).\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Listar salas (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": []
+                },
+                "description": "Lista las salas con paginación (page 1, limit 10 por defecto).\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Sala Rock 1\",\n      \"capacity\": 8,\n      \"floor\": 1,\n      \"hasDrumKit\": true,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 1,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Obtener sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/{{roomId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "{{roomId}}"
+              ],
+              "query": []
+            },
+            "description": "Devuelve una sala por id.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Obtener sala (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/{{roomId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "{{roomId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Devuelve una sala por id.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 8,\n  \"floor\": 1,\n  \"hasDrumKit\": true,\n  \"status\": \"disponible\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/{{roomId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "{{roomId}}"
+              ],
+              "query": []
+            },
+            "description": "Actualiza los campos enviados de la sala.\n\nStatus esperado: 200",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"capacity\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Actualizar sala (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/{{roomId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "{{roomId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Actualiza los campos enviados de la sala.\n\nStatus esperado: 200",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"capacity\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 10,\n  \"floor\": 1,\n  \"hasDrumKit\": true,\n  \"status\": \"disponible\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear sala temporal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('tmpRoomId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": []
+            },
+            "description": "Crea una sala sin reservas para probar el borrado. Guarda su id en la variable tmpRoomId.\n\nStatus esperado: 201",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sala Temporal\",\n  \"capacity\": 4,\n  \"floor\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Crear sala temporal (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": []
+                },
+                "description": "Crea una sala sin reservas para probar el borrado. Guarda su id en la variable tmpRoomId.\n\nStatus esperado: 201",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sala Temporal\",\n  \"capacity\": 4,\n  \"floor\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9aa\",\n  \"name\": \"Sala Temporal\",\n  \"capacity\": 4,\n  \"floor\": 2,\n  \"hasDrumKit\": false,\n  \"status\": \"disponible\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/{{tmpRoomId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "{{tmpRoomId}}"
+              ],
+              "query": []
+            },
+            "description": "Elimina la sala temporal (no tiene reservas).\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Eliminar sala (200)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/{{tmpRoomId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "{{tmpRoomId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Elimina la sala temporal (no tiene reservas).\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"message\": \"Sala eliminada\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bandas",
+      "item": [
+        {
+          "name": "Crear banda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.environment.set('bandId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": []
+            },
+            "description": "Crea una banda. Guarda el id en la variable bandId.\n\nStatus esperado: 201",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"rock\",\n  \"contactName\": \"Marta Rojas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Crear banda (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": []
+                },
+                "description": "Crea una banda. Guarda el id en la variable bandId.\n\nStatus esperado: 201",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"rock\",\n  \"contactName\": \"Marta Rojas\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"rock\",\n  \"active\": true,\n  \"contactName\": \"Marta Rojas\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar bandas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": []
+            },
+            "description": "Lista las bandas con paginación (page 1, limit 10 por defecto).\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Listar bandas (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": []
+                },
+                "description": "Lista las bandas con paginación (page 1, limit 10 por defecto).\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n      \"name\": \"Los Cuervos\",\n      \"genre\": \"rock\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 1,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Obtener banda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/{{bandId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "{{bandId}}"
+              ],
+              "query": []
+            },
+            "description": "Devuelve una banda por id, con sus músicos (populate).\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Obtener banda (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/{{bandId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "{{bandId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Devuelve una banda por id, con sus músicos (populate).\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"rock\",\n  \"active\": true,\n  \"contactName\": \"Marta Rojas\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0,\n  \"musicians\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9b3\",\n      \"name\": \"Luis Mora\",\n      \"instrument\": \"guitarra\",\n      \"email\": \"luis@correo.com\",\n      \"band\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n      \"active\": true\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar banda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/{{bandId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "{{bandId}}"
+              ],
+              "query": []
+            },
+            "description": "Actualiza los campos enviados de la banda.\n\nStatus esperado: 200",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"genre\": \"jazz\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Actualizar banda (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/{{bandId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "{{bandId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Actualiza los campos enviados de la banda.\n\nStatus esperado: 200",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"genre\": \"jazz\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"jazz\",\n  \"active\": true,\n  \"contactName\": \"Marta Rojas\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear banda temporal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('tmpBandId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": []
+            },
+            "description": "Crea una banda sin músicos ni reservas para probar el borrado. Guarda su id en la variable tmpBandId.\n\nStatus esperado: 201",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Banda Temporal\",\n  \"contactName\": \"Ana Solis\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Crear banda temporal (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": []
+                },
+                "description": "Crea una banda sin músicos ni reservas para probar el borrado. Guarda su id en la variable tmpBandId.\n\nStatus esperado: 201",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Banda Temporal\",\n  \"contactName\": \"Ana Solis\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"_id\": \"6710a1b2c3d4e5f6a7b8c9bb\",\n  \"name\": \"Banda Temporal\",\n  \"genre\": \"otro\",\n  \"active\": true,\n  \"contactName\": \"Ana Solis\",\n  \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n  \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar banda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/{{tmpBandId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "{{tmpBandId}}"
+              ],
+              "query": []
+            },
+            "description": "Elimina la banda temporal (no tiene músicos ni reservas).\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Eliminar banda (200)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/{{tmpBandId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "{{tmpBandId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Elimina la banda temporal (no tiene músicos ni reservas).\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"message\": \"Banda eliminada\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Consultas",
+      "item": [
+        {
+          "name": "Salas: página 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?page=1&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": 1
+                },
+                {
+                  "key": "limit",
+                  "value": 1
+                }
+              ]
+            },
+            "description": "Primera página de salas con limit=1.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Salas: página 1 (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?page=1&limit=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": 1
+                    },
+                    {
+                      "key": "limit",
+                      "value": 1
+                    }
+                  ]
+                },
+                "description": "Primera página de salas con limit=1.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Sala Rock 1\",\n      \"capacity\": 8,\n      \"floor\": 1,\n      \"hasDrumKit\": true,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 1,\n  \"total\": 2,\n  \"pages\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Salas: página 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?page=2&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": 2
+                },
+                {
+                  "key": "limit",
+                  "value": 1
+                }
+              ]
+            },
+            "description": "Segunda página de salas con limit=1.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Salas: página 2 (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?page=2&limit=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": 2
+                    },
+                    {
+                      "key": "limit",
+                      "value": 1
+                    }
+                  ]
+                },
+                "description": "Segunda página de salas con limit=1.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"Sala Jazz 2\",\n      \"capacity\": 12,\n      \"floor\": 2,\n      \"hasDrumKit\": false,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 2,\n  \"limit\": 1,\n  \"total\": 2,\n  \"pages\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Salas: orden ascendente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?sort=capacity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "capacity"
+                }
+              ]
+            },
+            "description": "Orden ascendente por capacity.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Salas: orden ascendente (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?sort=capacity",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "capacity"
+                    }
+                  ]
+                },
+                "description": "Orden ascendente por capacity.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Sala Rock 1\",\n      \"capacity\": 8,\n      \"floor\": 1,\n      \"hasDrumKit\": true,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    },\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"Sala Jazz 2\",\n      \"capacity\": 12,\n      \"floor\": 2,\n      \"hasDrumKit\": false,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 2,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Salas: orden descendente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?sort=-capacity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-capacity"
+                }
+              ]
+            },
+            "description": "Orden descendente por capacity.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Salas: orden descendente (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?sort=-capacity",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "-capacity"
+                    }
+                  ]
+                },
+                "description": "Orden descendente por capacity.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"Sala Jazz 2\",\n      \"capacity\": 12,\n      \"floor\": 2,\n      \"hasDrumKit\": false,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    },\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Sala Rock 1\",\n      \"capacity\": 8,\n      \"floor\": 1,\n      \"hasDrumKit\": true,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 2,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Salas: búsqueda con resultados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?search=jazz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "jazz"
+                }
+              ]
+            },
+            "description": "Busca por name sin distinguir mayúsculas. Devuelve resultados.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Salas: búsqueda con resultados (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?search=jazz",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "jazz"
+                    }
+                  ]
+                },
+                "description": "Busca por name sin distinguir mayúsculas. Devuelve resultados.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"Sala Jazz 2\",\n      \"capacity\": 12,\n      \"floor\": 2,\n      \"hasDrumKit\": false,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 1,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Salas: búsqueda sin resultados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?search=zzzz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "zzzz"
+                }
+              ]
+            },
+            "description": "Búsqueda sin coincidencias: data vacío, total 0 y pages 0.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Salas: búsqueda sin resultados (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?search=zzzz",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "zzzz"
+                    }
+                  ]
+                },
+                "description": "Búsqueda sin coincidencias: data vacío, total 0 y pages 0.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 0,\n  \"pages\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandas: página 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?page=1&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": 1
+                },
+                {
+                  "key": "limit",
+                  "value": 1
+                }
+              ]
+            },
+            "description": "Primera página de bandas con limit=1.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Bandas: página 1 (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?page=1&limit=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": 1
+                    },
+                    {
+                      "key": "limit",
+                      "value": 1
+                    }
+                  ]
+                },
+                "description": "Primera página de bandas con limit=1.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n      \"name\": \"Los Cuervos\",\n      \"genre\": \"rock\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 1,\n  \"total\": 2,\n  \"pages\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandas: página 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?page=2&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": 2
+                },
+                {
+                  "key": "limit",
+                  "value": 1
+                }
+              ]
+            },
+            "description": "Segunda página de bandas con limit=1.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Bandas: página 2 (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?page=2&limit=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": 2
+                    },
+                    {
+                      "key": "limit",
+                      "value": 1
+                    }
+                  ]
+                },
+                "description": "Segunda página de bandas con limit=1.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e2\",\n      \"name\": \"Coro Alegría\",\n      \"genre\": \"coral\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 2,\n  \"limit\": 1,\n  \"total\": 2,\n  \"pages\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandas: orden ascendente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?sort=name",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "name"
+                }
+              ]
+            },
+            "description": "Orden ascendente por name.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Bandas: orden ascendente (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?sort=name",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "name"
+                    }
+                  ]
+                },
+                "description": "Orden ascendente por name.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n      \"name\": \"Los Cuervos\",\n      \"genre\": \"rock\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    },\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e2\",\n      \"name\": \"Coro Alegría\",\n      \"genre\": \"coral\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 2,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandas: orden descendente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?sort=-name",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-name"
+                }
+              ]
+            },
+            "description": "Orden descendente por name.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Bandas: orden descendente (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?sort=-name",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "-name"
+                    }
+                  ]
+                },
+                "description": "Orden descendente por name.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e2\",\n      \"name\": \"Coro Alegría\",\n      \"genre\": \"coral\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    },\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n      \"name\": \"Los Cuervos\",\n      \"genre\": \"rock\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 2,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandas: búsqueda con resultados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?search=coro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "coro"
+                }
+              ]
+            },
+            "description": "Busca por name sin distinguir mayúsculas. Devuelve resultados.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Bandas: búsqueda con resultados (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?search=coro",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "coro"
+                    }
+                  ]
+                },
+                "description": "Busca por name sin distinguir mayúsculas. Devuelve resultados.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e2\",\n      \"name\": \"Coro Alegría\",\n      \"genre\": \"coral\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    }\n  ],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 1,\n  \"pages\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandas: búsqueda sin resultados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?search=zzzz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "zzzz"
+                }
+              ]
+            },
+            "description": "Búsqueda sin coincidencias: data vacío, total 0 y pages 0.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Bandas: búsqueda sin resultados (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?search=zzzz",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "zzzz"
+                    }
+                  ]
+                },
+                "description": "Búsqueda sin coincidencias: data vacío, total 0 y pages 0.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"data\": [],\n  \"page\": 1,\n  \"limit\": 10,\n  \"total\": 0,\n  \"pages\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Horario de una sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/{{roomId}}/schedule?date=2026-11-02",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "{{roomId}}",
+                "schedule"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-11-02"
+                }
+              ]
+            },
+            "description": "Reservas de la sala en esa fecha, ordenadas por startHour, con la banda poblada. Necesita que ya exista una reserva ese día.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Horario de una sala (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/{{roomId}}/schedule?date=2026-11-02",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "{{roomId}}",
+                    "schedule"
+                  ],
+                  "query": [
+                    {
+                      "key": "date",
+                      "value": "2026-11-02"
+                    }
+                  ]
+                },
+                "description": "Reservas de la sala en esa fecha, ordenadas por startHour, con la banda poblada. Necesita que ya exista una reserva ese día.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "[\n  {\n    \"_id\": \"6710a1b2c3d4e5f6a7b8c9f2\",\n    \"room\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n    \"band\": {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n      \"name\": \"Los Cuervos\",\n      \"genre\": \"rock\",\n      \"active\": true,\n      \"contactName\": \"Marta Rojas\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    },\n    \"date\": \"2026-11-02T00:00:00.000Z\",\n    \"startHour\": 16,\n    \"endHour\": 18,\n    \"status\": \"apartada\",\n    \"durationHours\": 2,\n    \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n    \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n    \"__v\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Músicos de una banda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/{{bandId}}/musicians",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "{{bandId}}",
+                "musicians"
+              ],
+              "query": []
+            },
+            "description": "Músicos de la banda.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Músicos de una banda (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/{{bandId}}/musicians",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "{{bandId}}",
+                    "musicians"
+                  ],
+                  "query": []
+                },
+                "description": "Músicos de la banda.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "[\n  {\n    \"_id\": \"6710a1b2c3d4e5f6a7b8c9b3\",\n    \"name\": \"Luis Mora\",\n    \"instrument\": \"guitarra\",\n    \"email\": \"luis@correo.com\",\n    \"band\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n    \"active\": true\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Reservas de una banda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/{{bandId}}/bookings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "{{bandId}}",
+                "bookings"
+              ],
+              "query": []
+            },
+            "description": "Reservas de la banda, cada una con su sala.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Reservas de una banda (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/{{bandId}}/bookings",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "{{bandId}}",
+                    "bookings"
+                  ],
+                  "query": []
+                },
+                "description": "Reservas de la banda, cada una con su sala.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "[\n  {\n    \"_id\": \"6710a1b2c3d4e5f6a7b8c9f2\",\n    \"room\": {\n      \"_id\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Sala Rock 1\",\n      \"capacity\": 8,\n      \"floor\": 1,\n      \"hasDrumKit\": true,\n      \"status\": \"disponible\",\n      \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n      \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n      \"__v\": 0\n    },\n    \"band\": \"6710a1b2c3d4e5f6a7b8c9e1\",\n    \"date\": \"2026-11-02T00:00:00.000Z\",\n    \"startHour\": 16,\n    \"endHour\": 18,\n    \"status\": \"apartada\",\n    \"durationHours\": 2,\n    \"createdAt\": \"2026-10-19T20:00:00.000Z\",\n    \"updatedAt\": \"2026-10-19T20:00:00.000Z\",\n    \"__v\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Stats de salas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "stats"
+              ],
+              "query": []
+            },
+            "description": "Por sala, cuántas reservas activas (apartada o confirmada) tiene.\n\nStatus esperado: 200"
+          },
+          "response": [
+            {
+              "name": "Stats de salas (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/stats",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "stats"
+                  ],
+                  "query": []
+                },
+                "description": "Por sala, cuántas reservas activas (apartada o confirmada) tiene.\n\nStatus esperado: 200"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "[\n  {\n    \"name\": \"Sala Jazz 2\",\n    \"room\": \"6710a1b2c3d4e5f6a7b8c9d1\",\n    \"activeBookings\": 0\n  },\n  {\n    \"name\": \"Sala Rock 1\",\n    \"room\": \"6710a1b2c3d4e5f6a7b8c9d0\",\n    \"activeBookings\": 1\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Errores",
+      "item": [
+        {
+          "name": "Sala con nombre repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": []
+            },
+            "description": "Intenta crear una sala con un name que ya existe.\n\nStatus esperado: 409",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 8,\n  \"floor\": 1,\n  \"hasDrumKit\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Sala con nombre repetido (409)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": []
+                },
+                "description": "Intenta crear una sala con un name que ya existe.\n\nStatus esperado: 409",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sala Rock 1\",\n  \"capacity\": 8,\n  \"floor\": 1,\n  \"hasDrumKit\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"Ya existe un registro con ese name\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Banda con nombre repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": []
+            },
+            "description": "Intenta crear una banda con un name que ya existe.\n\nStatus esperado: 409",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"rock\",\n  \"contactName\": \"Marta Rojas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Banda con nombre repetido (409)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": []
+                },
+                "description": "Intenta crear una banda con un name que ya existe.\n\nStatus esperado: 409",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Los Cuervos\",\n  \"genre\": \"rock\",\n  \"contactName\": \"Marta Rojas\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"Ya existe un registro con ese name\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Borrar sala con reserva activa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/{{roomId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "{{roomId}}"
+              ],
+              "query": []
+            },
+            "description": "Intenta borrar una sala que tiene una reserva apartada o confirmada. Correr después de crear la reserva.\n\nStatus esperado: 409"
+          },
+          "response": [
+            {
+              "name": "Borrar sala con reserva activa (409)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/{{roomId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "{{roomId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Intenta borrar una sala que tiene una reserva apartada o confirmada. Correr después de crear la reserva.\n\nStatus esperado: 409"
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"No se puede borrar la sala: tiene reservas apartadas o confirmadas\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Borrar banda con reserva activa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/{{bandId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "{{bandId}}"
+              ],
+              "query": []
+            },
+            "description": "Intenta borrar una banda que tiene una reserva apartada o confirmada. Correr después de crear la reserva.\n\nStatus esperado: 409"
+          },
+          "response": [
+            {
+              "name": "Borrar banda con reserva activa (409)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/{{bandId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "{{bandId}}"
+                  ],
+                  "query": []
+                },
+                "description": "Intenta borrar una banda que tiene una reserva apartada o confirmada. Correr después de crear la reserva.\n\nStatus esperado: 409"
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"No se puede borrar la banda: tiene reservas apartadas o confirmadas\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sala con id inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms",
+                "000000000000000000000000"
+              ],
+              "query": []
+            },
+            "description": "Id con formato válido que no existe.\n\nStatus esperado: 404"
+          },
+          "response": [
+            {
+              "name": "Sala con id inexistente (404)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms/000000000000000000000000",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms",
+                    "000000000000000000000000"
+                  ],
+                  "query": []
+                },
+                "description": "Id con formato válido que no existe.\n\nStatus esperado: 404"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"La sala no existe\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Banda con id inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands/000000000000000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands",
+                "000000000000000000000000"
+              ],
+              "query": []
+            },
+            "description": "Id con formato válido que no existe.\n\nStatus esperado: 404"
+          },
+          "response": [
+            {
+              "name": "Banda con id inexistente (404)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands/000000000000000000000000",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands",
+                    "000000000000000000000000"
+                  ],
+                  "query": []
+                },
+                "description": "Id con formato válido que no existe.\n\nStatus esperado: 404"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"La banda no existe\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sala con capacidad fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": []
+            },
+            "description": "Capacidad mayor a 30.\n\nStatus esperado: 400",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sala Grande\",\n  \"capacity\": 31,\n  \"floor\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Sala con capacidad fuera de rango (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": []
+                },
+                "description": "Capacidad mayor a 30.\n\nStatus esperado: 400",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sala Grande\",\n  \"capacity\": 31,\n  \"floor\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"La capacidad máxima es 30\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listado con limit inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?limit=51",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rooms"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": 51
+                }
+              ]
+            },
+            "description": "limit mayor a 50.\n\nStatus esperado: 400"
+          },
+          "response": [
+            {
+              "name": "Listado con limit inválido (400)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/rooms?limit=51",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "rooms"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": 51
+                    }
+                  ]
+                },
+                "description": "limit mayor a 50.\n\nStatus esperado: 400"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"limit debe ser un entero entre 1 y 50\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listado con sort inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bands?sort=capacity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bands"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "capacity"
+                }
+              ]
+            },
+            "description": "Campo de sort fuera de la lista.\n\nStatus esperado: 400"
+          },
+          "response": [
+            {
+              "name": "Listado con sort inválido (400)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/bands?sort=capacity",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bands"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "capacity"
+                    }
+                  ]
+                },
+                "description": "Campo de sort fuera de la lista.\n\nStatus esperado: 400"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"error\": \"sort solo acepta: name, createdAt (con - para orden descendente)\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
