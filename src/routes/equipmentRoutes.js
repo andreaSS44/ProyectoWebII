@@ -1,0 +1,10 @@
+const express = require('express');
+const controller = require('../controllers/equipmentController');
+const router = express.Router();
+router.post('/', controller.createEquipment);
+router.get('/', controller.getEquipmentList);
+router.get('/stats', controller.getEquipmentStats);
+router.get('/:id', controller.getEquipment);
+router.put('/:id', controller.updateEquipment);
+router.delete('/:id', controller.deleteEquipment);
+module.exports = router;

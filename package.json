@@ -1,0 +1,28 @@
+{
+  "name": "proyectowebii",
+  "version": "1.0.0",
+  "description": "Esta parte se pega en el README general (sección Índices) y sirve de guía para la defensa.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node --test tests/persona2.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreaSS44/ProyectoWebII.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/andreaSS44/ProyectoWebII/issues"
+  },
+  "homepage": "https://github.com/andreaSS44/ProyectoWebII#readme",
+  "dependencies": {
+    "express": "^5.3.0",
+    "mongoose": "^8.24.6"
+  }
+}
