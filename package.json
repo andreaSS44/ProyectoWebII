@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "node --test tests/persona2.test.js"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",
