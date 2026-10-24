@@ -7,6 +7,8 @@
     "test": "tests"
   },
   "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "test": "node --test"
   },
   "repository": {
@@ -22,6 +24,7 @@
   },
   "homepage": "https://github.com/andreaSS44/ProyectoWebII#readme",
   "dependencies": {
+    "dotenv": "^18.0.9",
     "express": "^5.3.0",
     "mongoose": "^8.24.6"
   }
