@@ -1,8 +1,10 @@
 const Booking = require('../models/Booking');
+const Room = require('../models/Room');
 const HttpError = require('../utils/HttpError');
 const { checkId, pick } = require('../utils/helpers');
 const { parseListQuery, pageResponse } = require('../utils/listQuery');
 const {
+  ESTADOS_ACTIVOS,
   TRANSICIONES,
   parseBookingDate,
   checkBookingRules,
@@ -14,6 +16,18 @@ const CAMPOS = ['room', 'band', 'date', 'startHour', 'endHour', 'notes'];
 // Campos que cambian el horario: si llega alguno se vuelven a revisar las reglas.
 const CAMPOS_HORARIO = ['room', 'band', 'date', 'startHour', 'endHour'];
 const ESTADOS = Object.keys(TRANSICIONES);
+
+// Arma { $gte, $lte } con from y to del query string. Devuelve null si no mandan ninguno.
+function dateRange(query) {
+  if (query.from === undefined && query.to === undefined) return null;
+  const range = {};
+  if (query.from !== undefined) range.$gte = parseBookingDate(query.from);
+  if (query.to !== undefined) range.$lte = parseBookingDate(query.to);
+  if (range.$gte && range.$lte && range.$gte > range.$lte) {
+    throw new HttpError(400, 'from no puede ser posterior a to');
+  }
+  return range;
+}
 
 // Revisa las reglas y guarda la reserva usando la sesión que le pasen.
 // La persona 4 la envuelve en withTransaction y crea aquí los préstamos de equipment.
@@ -58,13 +72,9 @@ async function getBookings(req, res) {
 
   if (req.query.date !== undefined) {
     filter.date = parseBookingDate(req.query.date);
-  } else if (req.query.from !== undefined || req.query.to !== undefined) {
-    filter.date = {};
-    if (req.query.from !== undefined) filter.date.$gte = parseBookingDate(req.query.from);
-    if (req.query.to !== undefined) filter.date.$lte = parseBookingDate(req.query.to);
-    if (filter.date.$gte && filter.date.$lte && filter.date.$gte > filter.date.$lte) {
-      throw new HttpError(400, 'from no puede ser posterior a to');
-    }
+  } else {
+    const range = dateRange(req.query);
+    if (range) filter.date = range;
   }
 
   const [data, total] = await Promise.all([
@@ -132,6 +142,55 @@ async function updateBooking(req, res) {
   res.json(booking);
 }
 
+// GET /api/bookings/stats?from=2026-11-01&to=2026-11-30
+// byStatus: reservas y horas por estado.
+// byRoom: reservas y horas activas (apartada o confirmada) por sala, de la más usada a la menos.
+async function getBookingStats(req, res) {
+  const match = {};
+  const range = dateRange(req.query);
+  if (range) match.date = range;
+
+  const horas = { $subtract: ['$endHour', '$startHour'] };
+
+  const [stats] = await Booking.aggregate([
+    { $match: match },
+    {
+      $facet: {
+        byStatus: [
+          { $group: { _id: '$status', bookings: { $sum: 1 }, totalHours: { $sum: horas } } },
+          { $project: { _id: 0, status: '$_id', bookings: 1, totalHours: 1 } },
+          { $sort: { status: 1 } },
+        ],
+        byRoom: [
+          { $match: { status: { $in: ESTADOS_ACTIVOS } } },
+          { $group: { _id: '$room', bookings: { $sum: 1 }, totalHours: { $sum: horas } } },
+          {
+            $lookup: {
+              from: Room.collection.name,
+              localField: '_id',
+              foreignField: '_id',
+              as: 'room',
+            },
+          },
+          { $unwind: '$room' },
+          {
+            $project: {
+              _id: 0,
+              room: '$_id',
+              name: '$room.name',
+              bookings: 1,
+              totalHours: 1,
+            },
+          },
+          { $sort: { bookings: -1, name: 1 } },
+        ],
+      },
+    },
+  ]);
+
+  res.json(stats);
+}
+
 module.exports = {
   createBookingWithSession,
   createBooking,
@@ -139,4 +198,5 @@ module.exports = {
   getBooking,
   cancelBooking,
   updateBooking,
+  getBookingStats,
 };
