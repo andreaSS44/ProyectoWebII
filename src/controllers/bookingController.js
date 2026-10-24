@@ -6,10 +6,13 @@ const {
   TRANSICIONES,
   parseBookingDate,
   checkBookingRules,
+  checkStatusChange,
   checkEquipmentLines,
 } = require('../utils/bookingRules');
 
 const CAMPOS = ['room', 'band', 'date', 'startHour', 'endHour', 'notes'];
+// Campos que cambian el horario: si llega alguno se vuelven a revisar las reglas.
+const CAMPOS_HORARIO = ['room', 'band', 'date', 'startHour', 'endHour'];
 const ESTADOS = Object.keys(TRANSICIONES);
 
 // Revisa las reglas y guarda la reserva usando la sesión que le pasen.
@@ -81,9 +84,59 @@ async function getBooking(req, res) {
   res.json(booking);
 }
 
+// Pasa la reserva a cancelada usando la sesión que le pasen.
+// La persona 4 la envuelve en withTransaction y devuelve aquí los préstamos ($inc de availableUnits).
+async function cancelBooking(booking, session = null) {
+  booking.status = 'cancelada';
+  await booking.save({ session });
+  return booking;
+}
+
+// PUT /api/bookings/:id
+// Con status: 'cancelada' se cancela la reserva; en ese caso solo se aplican status y notes.
+async function updateBooking(req, res) {
+  checkId(req.params.id);
+  const booking = await Booking.findById(req.params.id);
+  if (!booking) throw new HttpError(404, 'La reserva no existe');
+
+  if (booking.status === 'cancelada') {
+    throw new HttpError(409, 'No se puede editar una reserva cancelada');
+  }
+
+  const { status } = req.body;
+  checkStatusChange(booking.status, status);
+  const data = pick(req.body, CAMPOS);
+
+  if (status === 'cancelada') {
+    if (data.notes !== undefined) booking.notes = data.notes;
+    await cancelBooking(booking);
+    return res.json(booking);
+  }
+
+  if (CAMPOS_HORARIO.some((campo) => data[campo] !== undefined)) {
+    // Los campos que no mandan se toman de la reserva guardada.
+    const merged = {};
+    for (const campo of CAMPOS_HORARIO) {
+      merged[campo] = data[campo] !== undefined ? data[campo] : booking[campo];
+    }
+    const { date } = await checkBookingRules(merged, {
+      excludeId: booking._id,
+      checkDate: data.date !== undefined,
+    });
+    if (data.date !== undefined) data.date = date;
+  }
+
+  booking.set(data);
+  if (status !== undefined) booking.status = status;
+  await booking.save();
+  res.json(booking);
+}
+
 module.exports = {
   createBookingWithSession,
   createBooking,
   getBookings,
   getBooking,
+  cancelBooking,
+  updateBooking,
 };
