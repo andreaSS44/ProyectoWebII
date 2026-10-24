@@ -1,8 +1,13 @@
+
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Room = require('../models/Room');
+const Equipment = require('../models/Equipment');
+const Loan = require('../models/Loan');
 const HttpError = require('../utils/HttpError');
 const { checkId, pick } = require('../utils/helpers');
 const { parseListQuery, pageResponse } = require('../utils/listQuery');
+
 const {
   ESTADOS_ACTIVOS,
   TRANSICIONES,
@@ -13,27 +18,75 @@ const {
 } = require('../utils/bookingRules');
 
 const CAMPOS = ['room', 'band', 'date', 'startHour', 'endHour', 'notes'];
-// Campos que cambian el horario: si llega alguno se vuelven a revisar las reglas.
 const CAMPOS_HORARIO = ['room', 'band', 'date', 'startHour', 'endHour'];
 const ESTADOS = Object.keys(TRANSICIONES);
 
-// Arma { $gte, $lte } con from y to del query string. Devuelve null si no mandan ninguno.
+// Construir el rango de fechas
 function dateRange(query) {
   if (query.from === undefined && query.to === undefined) return null;
+
   const range = {};
-  if (query.from !== undefined) range.$gte = parseBookingDate(query.from);
-  if (query.to !== undefined) range.$lte = parseBookingDate(query.to);
+
+  if (query.from !== undefined) {
+    range.$gte = parseBookingDate(query.from);
+  }
+
+  if (query.to !== undefined) {
+    range.$lte = parseBookingDate(query.to);
+  }
+
   if (range.$gte && range.$lte && range.$gte > range.$lte) {
     throw new HttpError(400, 'from no puede ser posterior a to');
   }
+
   return range;
 }
 
-// Revisa las reglas y guarda la reserva usando la sesión que le pasen.
-// La persona 4 la envuelve en withTransaction y crea aquí los préstamos de equipment.
-async function createBookingWithSession(data, equipment, session = null) {
+// Crear reserva y registrar préstamos
+async function createBookingWithSession(data, equipment, session) {
   const { date } = await checkBookingRules(data, { session });
-  const [booking] = await Booking.create([{ ...data, date }], { session });
+
+  const [booking] = await Booking.create(
+    [{ ...data, date }],
+    { session }
+  );
+
+  // Descontar equipos disponibles
+  for (const item of equipment) {
+    const updatedEquipment = await Equipment.findOneAndUpdate(
+      {
+        _id: item.equipmentId,
+        availableUnits: { $gte: item.units },
+      },
+      {
+        $inc: { availableUnits: -item.units },
+      },
+      {
+        new: true,
+        session,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedEquipment) {
+      throw new HttpError(
+        409,
+        'El equipo no existe o no tiene suficientes unidades disponibles'
+      );
+    }
+
+    // Guardar el préstamo
+    await Loan.create(
+      [{
+        booking: booking._id,
+        equipment: item.equipmentId,
+        units: item.units,
+        status: 'prestado',
+      }],
+      { session }
+    );
+  }
+
   return booking;
 }
 
@@ -42,12 +95,26 @@ async function createBooking(req, res) {
   const data = pick(req.body, CAMPOS);
   const equipment = checkEquipmentLines(req.body.equipment);
 
-  const booking = await createBookingWithSession(data, equipment);
+  const session = await mongoose.startSession();
+  let booking;
+
+  try {
+    // Ejecutar la creación como transacción
+    await session.withTransaction(async () => {
+      booking = await createBookingWithSession(
+        data,
+        equipment,
+        session
+      );
+    });
+  } finally {
+    await session.endSession();
+  }
+
   res.status(201).json(booking);
 }
 
 // GET /api/bookings
-// Filtros: room, band, status, date (un día) o from/to (rango de días).
 async function getBookings(req, res) {
   const { page, limit, skip, sort } = parseListQuery(req.query, {
     sortFields: ['date', 'startHour', 'status', 'createdAt'],
@@ -55,18 +122,25 @@ async function getBookings(req, res) {
   });
 
   const filter = {};
+
   if (req.query.room !== undefined) {
     checkId(req.query.room);
     filter.room = req.query.room;
   }
+
   if (req.query.band !== undefined) {
     checkId(req.query.band);
     filter.band = req.query.band;
   }
+
   if (req.query.status !== undefined) {
     if (!ESTADOS.includes(req.query.status)) {
-      throw new HttpError(400, 'status debe ser apartada, confirmada o cancelada');
+      throw new HttpError(
+        400,
+        'status debe ser apartada, confirmada o cancelada'
+      );
     }
+
     filter.status = req.query.status;
   }
 
@@ -78,7 +152,11 @@ async function getBookings(req, res) {
   }
 
   const [data, total] = await Promise.all([
-    Booking.find(filter).sort(sort).skip(skip).limit(limit).populate('room band'),
+    Booking.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('room band'),
     Booking.countDocuments(filter),
   ]);
 
@@ -86,84 +164,224 @@ async function getBookings(req, res) {
 }
 
 // GET /api/bookings/:id
-// Cuando exista el modelo Loan se agrega 'loans' al populate.
 async function getBooking(req, res) {
   checkId(req.params.id);
-  const booking = await Booking.findById(req.params.id).populate('room band');
-  if (!booking) throw new HttpError(404, 'La reserva no existe');
+
+  const booking = await Booking.findById(req.params.id)
+    .populate('room band')
+    .populate({
+      path: 'loans',
+      populate: { path: 'equipment' },
+    });
+
+  if (!booking) {
+    throw new HttpError(404, 'La reserva no existe');
+  }
+
   res.json(booking);
 }
 
-// Pasa la reserva a cancelada usando la sesión que le pasen.
-// La persona 4 la envuelve en withTransaction y devuelve aquí los préstamos ($inc de availableUnits).
-async function cancelBooking(booking, session = null) {
+// Cancelar reserva y devolver equipos
+async function cancelBooking(booking, session) {
+  checkStatusChange(booking.status, 'cancelada');
+
+  if (booking.status === 'cancelada') {
+    throw new HttpError(409, 'La reserva ya está cancelada');
+  }
+
+  // Buscar préstamos pendientes
+  const loans = await Loan.find({
+    booking: booking._id,
+    status: 'prestado',
+  }).session(session);
+
+  for (const loan of loans) {
+    // Devolver unidades al inventario
+    const equipment = await Equipment.findOneAndUpdate(
+      {
+        _id: loan.equipment,
+        $expr: {
+          $lte: [
+            { $add: ['$availableUnits', loan.units] },
+            '$totalUnits',
+          ],
+        },
+      },
+      {
+        $inc: { availableUnits: loan.units },
+      },
+      {
+        new: true,
+        session,
+        runValidators: true,
+      }
+    );
+
+    if (!equipment) {
+      throw new HttpError(
+        409,
+        'No se pudo devolver el equipo al inventario'
+      );
+    }
+
+    // Marcar préstamo como devuelto
+    loan.status = 'devuelto';
+    await loan.save({ session });
+  }
+
   booking.status = 'cancelada';
   await booking.save({ session });
+
   return booking;
 }
 
+// PATCH /api/bookings/:id/cancel
+async function cancelBookingById(req, res) {
+  checkId(req.params.id);
+
+  const session = await mongoose.startSession();
+  let booking;
+
+  try {
+    await session.withTransaction(async () => {
+      booking = await Booking.findById(req.params.id)
+        .session(session);
+
+      if (!booking) {
+        throw new HttpError(404, 'La reserva no existe');
+      }
+
+      booking = await cancelBooking(booking, session);
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  res.json(booking);
+}
+
 // PUT /api/bookings/:id
-// Con status: 'cancelada' se cancela la reserva; en ese caso solo se aplican status y notes.
 async function updateBooking(req, res) {
   checkId(req.params.id);
+
+  const { status } = req.body;
+  const data = pick(req.body, CAMPOS);
+
+  // Cancelar dentro de una transacción
+  if (status === 'cancelada') {
+    const session = await mongoose.startSession();
+    let booking;
+
+    try {
+      await session.withTransaction(async () => {
+        booking = await Booking.findById(req.params.id)
+          .session(session);
+
+        if (!booking) {
+          throw new HttpError(404, 'La reserva no existe');
+        }
+
+        if (data.notes !== undefined) {
+          booking.notes = data.notes;
+        }
+
+        booking = await cancelBooking(booking, session);
+      });
+    } finally {
+      await session.endSession();
+    }
+
+    return res.json(booking);
+  }
+
   const booking = await Booking.findById(req.params.id);
-  if (!booking) throw new HttpError(404, 'La reserva no existe');
+
+  if (!booking) {
+    throw new HttpError(404, 'La reserva no existe');
+  }
 
   if (booking.status === 'cancelada') {
     throw new HttpError(409, 'No se puede editar una reserva cancelada');
   }
 
-  const { status } = req.body;
   checkStatusChange(booking.status, status);
-  const data = pick(req.body, CAMPOS);
 
-  if (status === 'cancelada') {
-    if (data.notes !== undefined) booking.notes = data.notes;
-    await cancelBooking(booking);
-    return res.json(booking);
-  }
-
+  // Validar cambios de horario
   if (CAMPOS_HORARIO.some((campo) => data[campo] !== undefined)) {
-    // Los campos que no mandan se toman de la reserva guardada.
     const merged = {};
+
     for (const campo of CAMPOS_HORARIO) {
-      merged[campo] = data[campo] !== undefined ? data[campo] : booking[campo];
+      merged[campo] = data[campo] !== undefined
+        ? data[campo]
+        : booking[campo];
     }
+
     const { date } = await checkBookingRules(merged, {
       excludeId: booking._id,
       checkDate: data.date !== undefined,
     });
-    if (data.date !== undefined) data.date = date;
+
+    if (data.date !== undefined) {
+      data.date = date;
+    }
   }
 
   booking.set(data);
-  if (status !== undefined) booking.status = status;
+
+  if (status !== undefined) {
+    booking.status = status;
+  }
+
   await booking.save();
   res.json(booking);
 }
 
-// GET /api/bookings/stats?from=2026-11-01&to=2026-11-30
-// byStatus: reservas y horas por estado.
-// byRoom: reservas y horas activas (apartada o confirmada) por sala, de la más usada a la menos.
+// GET /api/bookings/stats
 async function getBookingStats(req, res) {
   const match = {};
   const range = dateRange(req.query);
+
   if (range) match.date = range;
 
-  const horas = { $subtract: ['$endHour', '$startHour'] };
+  const horas = {
+    $subtract: ['$endHour', '$startHour'],
+  };
 
   const [stats] = await Booking.aggregate([
     { $match: match },
     {
       $facet: {
         byStatus: [
-          { $group: { _id: '$status', bookings: { $sum: 1 }, totalHours: { $sum: horas } } },
-          { $project: { _id: 0, status: '$_id', bookings: 1, totalHours: 1 } },
+          {
+            $group: {
+              _id: '$status',
+              bookings: { $sum: 1 },
+              totalHours: { $sum: horas },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              status: '$_id',
+              bookings: 1,
+              totalHours: 1,
+            },
+          },
           { $sort: { status: 1 } },
         ],
         byRoom: [
-          { $match: { status: { $in: ESTADOS_ACTIVOS } } },
-          { $group: { _id: '$room', bookings: { $sum: 1 }, totalHours: { $sum: horas } } },
+          {
+            $match: {
+              status: { $in: ESTADOS_ACTIVOS },
+            },
+          },
+          {
+            $group: {
+              _id: '$room',
+              bookings: { $sum: 1 },
+              totalHours: { $sum: horas },
+            },
+          },
           {
             $lookup: {
               from: Room.collection.name,
@@ -197,6 +415,7 @@ module.exports = {
   getBookings,
   getBooking,
   cancelBooking,
+  cancelBookingById,
   updateBooking,
   getBookingStats,
 };
