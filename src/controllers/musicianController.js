@@ -4,7 +4,7 @@ const HttpError = require('../utils/HttpError');
 const { checkId, pick } = require('../utils/helpers');
 const { parseListQuery, searchRegex, pageResponse } = require('../utils/listQuery');
 const { booleanFilter } = require('../utils/resourceFilters');
-const CAMPOS = ['name', 'instrument', 'band', 'active'];
+const CAMPOS = ['name', 'instrument', 'email', 'band', 'active'];
 
 async function validateBand(id) {
   checkId(id);
@@ -22,7 +22,10 @@ async function getMusicians(req, res) {
     sortFields: ['name', 'instrument', 'createdAt'], defaultSort: { name: 1 },
   });
   const filter = {};
-  if (req.query.search) filter.name = searchRegex(req.query.search);
+  if (req.query.search) {
+    const search = searchRegex(req.query.search);
+    filter.$or = [{ name: search }, { email: search }];
+  }
   if (req.query.band !== undefined) { checkId(req.query.band); filter.band = req.query.band; }
   if (req.query.active !== undefined) filter.active = booleanFilter(req.query.active, 'active');
   const [data, total] = await Promise.all([

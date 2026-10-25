@@ -12,7 +12,7 @@ async function createEquipment(req, res) {
 
 async function getEquipmentList(req, res) {
   const { page, limit, skip, sort } = parseListQuery(req.query, {
-    sortFields: ['name', 'category', 'totalUnits', 'availableUnits', 'createdAt'],
+    sortFields: ['name', 'availableUnits', 'createdAt'],
     defaultSort: { name: 1 },
   });
   const filter = {};

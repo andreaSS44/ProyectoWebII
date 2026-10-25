@@ -14,7 +14,14 @@ test('validaciones de modelos y disponibilidad inicial', async () => {
   await assert.rejects(equipment.validate());
   equipment.totalUnits = 2;
   await assert.rejects(equipment.validate());
+  await assert.rejects(new Equipment({ name: 'Vacío', category: 'audio', totalUnits: 0 }).validate());
+  await assert.rejects(new Equipment({ name: 'Otro', category: 'luces', totalUnits: 1 }).validate());
   await assert.rejects(new Musician({ name: 'Ana', instrument: 'guitarra' }).validate());
+  const musician = new Musician({
+    name: 'Ana', instrument: 'guitarra', email: 'ANA@EXAMPLE.COM', band: '507f1f77bcf86cd799439011',
+  });
+  await musician.validate();
+  assert.equal(musician.email, 'ana@example.com');
 });
 
 test('filtros booleanos rechazan valores ambiguos', () => {

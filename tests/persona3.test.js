@@ -1,9 +1,11 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const mongoose = require('mongoose');
 const Booking = require('../src/models/Booking');
 const Room = require('../src/models/Room');
 const Band = require('../src/models/Band');
 const Musician = require('../src/models/Musician');
+const Loan = require('../src/models/Loan');
 const controller = require('../src/controllers/bookingController');
 const {
   parseBookingDate,
@@ -140,7 +142,16 @@ test('checkBookingRules revisa sala, banda, músicos, capacidad y traslapes', as
 
 test('updateBooking: cancelada no se edita, cancelar solo aplica status y notes', async (t) => {
   let current;
-  t.mock.method(Booking, 'findById', async () => current);
+  const query = (value) => ({
+    session: async () => value,
+    then(resolve, reject) { return Promise.resolve(value).then(resolve, reject); },
+  });
+  t.mock.method(Booking, 'findById', () => query(current));
+  t.mock.method(Loan, 'find', () => ({ session: async () => [] }));
+  t.mock.method(mongoose, 'startSession', async () => ({
+    async withTransaction(callback) { await callback(); },
+    async endSession() {},
+  }));
   const load = (estado) => {
     current = new Booking({ ...bookingData(), date: parseBookingDate(FUTURE), status: estado });
     current.save = async function () { await this.validate(); return this; };

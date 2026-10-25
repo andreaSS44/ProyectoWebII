@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const equipmentSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true, trim: true, minlength: 2, maxlength: 80 },
-  category: { type: String, required: true, trim: true, lowercase: true, maxlength: 50 },
-  totalUnits: { type: Number, required: true, min: 0, validate: Number.isInteger },
+  category: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+    enum: ['audio', 'cuerdas', 'percusion'],
+  },
+  totalUnits: { type: Number, required: true, min: 1, validate: Number.isInteger },
   availableUnits: {
     type: Number,
     default: function () { return this.totalUnits; },

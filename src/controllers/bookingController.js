@@ -6,7 +6,7 @@ const Equipment = require('../models/Equipment');
 const Loan = require('../models/Loan');
 const HttpError = require('../utils/HttpError');
 const { checkId, pick } = require('../utils/helpers');
-const { parseListQuery, pageResponse } = require('../utils/listQuery');
+const { parseListQuery, searchRegex, pageResponse } = require('../utils/listQuery');
 
 const {
   ESTADOS_ACTIVOS,
@@ -53,6 +53,11 @@ async function createBookingWithSession(data, equipment, session) {
 
   // Descontar equipos disponibles
   for (const item of equipment) {
+    const existingEquipment = await Equipment.findById(item.equipmentId).session(session);
+    if (!existingEquipment) {
+      throw new HttpError(404, 'El equipo no existe');
+    }
+
     const updatedEquipment = await Equipment.findOneAndUpdate(
       {
         _id: item.equipmentId,
@@ -71,7 +76,7 @@ async function createBookingWithSession(data, equipment, session) {
     if (!updatedEquipment) {
       throw new HttpError(
         409,
-        'El equipo no existe o no tiene suficientes unidades disponibles'
+        'El equipo no tiene suficientes unidades disponibles'
       );
     }
 
@@ -117,11 +122,15 @@ async function createBooking(req, res) {
 // GET /api/bookings
 async function getBookings(req, res) {
   const { page, limit, skip, sort } = parseListQuery(req.query, {
-    sortFields: ['date', 'startHour', 'status', 'createdAt'],
+    sortFields: ['date', 'startHour', 'createdAt'],
     defaultSort: { date: 1, startHour: 1 },
   });
 
   const filter = {};
+
+  if (req.query.search) {
+    filter.notes = searchRegex(req.query.search);
+  }
 
   if (req.query.room !== undefined) {
     checkId(req.query.room);
@@ -168,7 +177,16 @@ async function getBooking(req, res) {
   checkId(req.params.id);
 
   const booking = await Booking.findById(req.params.id)
-    .populate('room band')
+    .populate({ path: 'room', select: 'name capacity status' })
+    .populate({
+      path: 'band',
+      select: 'name genre',
+      populate: {
+        path: 'musicians',
+        match: { active: true },
+        select: 'name instrument email active',
+      },
+    })
     .populate({
       path: 'loans',
       populate: { path: 'equipment' },
@@ -306,24 +324,17 @@ async function updateBooking(req, res) {
 
   checkStatusChange(booking.status, status);
 
-  // Validar cambios de horario
-  if (CAMPOS_HORARIO.some((campo) => data[campo] !== undefined)) {
-    const merged = {};
-
-    for (const campo of CAMPOS_HORARIO) {
-      merged[campo] = data[campo] !== undefined
-        ? data[campo]
-        : booking[campo];
-    }
-
-    const { date } = await checkBookingRules(merged, {
-      excludeId: booking._id,
-      checkDate: data.date !== undefined,
-    });
-
-    if (data.date !== undefined) {
-      data.date = date;
-    }
+  // Toda actualización vuelve a comprobar las reglas de la reserva.
+  const merged = {};
+  for (const campo of CAMPOS_HORARIO) {
+    merged[campo] = data[campo] !== undefined ? data[campo] : booking[campo];
+  }
+  const { date } = await checkBookingRules(merged, {
+    excludeId: booking._id,
+    checkDate: data.date !== undefined,
+  });
+  if (data.date !== undefined) {
+    data.date = date;
   }
 
   booking.set(data);

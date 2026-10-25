@@ -1,7 +1,7 @@
 
-const mongoose = require('mongoose');
 const Loan = require('../models/Loan');
 const HttpError = require('../utils/HttpError');
+const { checkId } = require('../utils/helpers');
 const {
   parseListQuery,
   searchRegex,
@@ -28,17 +28,13 @@ async function getLoans(req, res) {
 
   // Filtrar por reserva.
   if (req.query.booking !== undefined) {
-    if (!mongoose.isValidObjectId(req.query.booking)) {
-      throw new HttpError(400, 'El ID de la reserva no es válido');
-    }
+    checkId(req.query.booking);
     filter.booking = req.query.booking;
   }
 
   // Filtrar por equipo.
   if (req.query.equipment !== undefined) {
-    if (!mongoose.isValidObjectId(req.query.equipment)) {
-      throw new HttpError(400, 'El ID del equipo no es válido');
-    }
+    checkId(req.query.equipment);
     filter.equipment = req.query.equipment;
   }
 
@@ -76,9 +72,7 @@ async function getLoans(req, res) {
 async function getLoanById(req, res) {
   const { id } = req.params;
 
-  if (!mongoose.isValidObjectId(id)) {
-    throw new HttpError(400, 'El ID del préstamo no es válido');
-  }
+  checkId(id);
 
   const loan = await Loan.findById(id)
     .populate('booking')
